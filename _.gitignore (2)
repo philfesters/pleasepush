@@ -1,0 +1,38 @@
+# SSH — NEVER commit these
+.ssh/
+*.pem
+id_rsa
+id_ed25519
+id_ecdsa
+*.ppk
+
+# Environment & secrets
+.env
+.env.local
+.env.*
+secrets.txt
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Node
+node_modules/
+npm-debug.log
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Termux
+.bash_history
