@@ -1,799 +1,614 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>ARSENAL by Fezzy CPT | Strategy Over Impulse</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet"/>
-<style>
-  :root {
-    --hot: #ff2d78;
-    --pink: #ff85c0;
-    --purp: #b05fff;
-    --cyan: #00f0ff;
-    --elec: #2979ff;
-    --lime: #b6ff00;
-    --dark: #080810;
-    --card: #0e0e1a;
-    --card2: #12121f;
-    --fade: #3a3a55;
-    --white: #f0f0ff;
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pleasepush / Grant Phil Festers · GitHub x SoundCloud</title>
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- jsPDF for PDF generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #0d1117;
+            color: #e6edf3;
+            line-height: 1.5;
+        }
 
-  body {
-    background: var(--dark);
-    color: var(--white);
-    font-family: 'Space Mono', monospace;
-    overflow-x: hidden;
-  }
+        /* SoundCloud / Neon Wave Theme */
+        :root {
+            --soundcloud-orange: #ff5500;
+            --soundcloud-dark: #1a1a1a;
+            --github-border: #30363d;
+            --accent-glow: 0 0 10px rgba(255, 85, 0, 0.5);
+        }
 
-  /* Grain overlay */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 9999;
-  }
+        /* Wave Animation Header */
+        .wave-header {
+            background: linear-gradient(145deg, #0a0c10 0%, #161b22 100%);
+            border-bottom: 1px solid var(--github-border);
+            padding: 16px 32px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            position: relative;
+            overflow: hidden;
+        }
 
-  /* Hero */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    padding: 40px 20px;
-    position: relative;
-    overflow: hidden;
-  }
+        .wave-header::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: repeating-linear-gradient(90deg, #ff5500 0px, #ff5500 10px, #ff8800 10px, #ff8800 20px);
+            animation: waveMove 1s linear infinite;
+        }
 
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 70% 50% at 20% 30%, rgba(255,45,120,0.12) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 60% at 80% 70%, rgba(176,95,255,0.1) 0%, transparent 60%),
-      radial-gradient(ellipse 50% 40% at 50% 90%, rgba(0,240,255,0.07) 0%, transparent 60%);
-  }
+        @keyframes waveMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
 
-  .scan-lines {
-    position: absolute;
-    inset: 0;
-    background: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 2px,
-      rgba(0,0,0,0.15) 2px,
-      rgba(0,0,0,0.15) 4px
-    );
-    pointer-events: none;
-  }
+        .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
 
-  .tag {
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    letter-spacing: 4px;
-    color: var(--hot);
-    text-transform: uppercase;
-    margin-bottom: 16px;
-    animation: fadeUp 0.8s ease forwards;
-    opacity: 0;
-  }
+        .github-icon {
+            font-size: 32px;
+            color: #f0f6fc;
+        }
 
-  .hero-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(72px, 18vw, 160px);
-    line-height: 0.9;
-    letter-spacing: 4px;
-    background: linear-gradient(135deg, var(--hot) 0%, var(--purp) 50%, var(--cyan) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    animation: fadeUp 0.8s 0.1s ease forwards;
-    opacity: 0;
-  }
+        .repo-title {
+            font-size: 20px;
+            font-weight: 600;
+        }
 
-  .hero-sub {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(18px, 4vw, 32px);
-    letter-spacing: 6px;
-    color: var(--purp);
-    margin-top: 8px;
-    animation: fadeUp 0.8s 0.2s ease forwards;
-    opacity: 0;
-  }
+        .repo-title span {
+            color: var(--soundcloud-orange);
+            font-weight: 300;
+        }
 
-  .hero-desc {
-    max-width: 520px;
-    margin: 28px auto 0;
-    font-size: 13px;
-    line-height: 1.8;
-    color: rgba(240,240,255,0.6);
-    animation: fadeUp 0.8s 0.3s ease forwards;
-    opacity: 0;
-  }
+        .tagline {
+            font-size: 14px;
+            color: #8b949e;
+            margin-top: 4px;
+        }
 
-  .hero-badges {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    justify-content: center;
-    margin-top: 28px;
-    animation: fadeUp 0.8s 0.4s ease forwards;
-    opacity: 0;
-  }
+        .creator-badge {
+            background: #21262d;
+            border-radius: 30px;
+            padding: 8px 16px;
+            border: 1px solid #ff550050;
+            box-shadow: var(--accent-glow);
+        }
 
-  .badge {
-    padding: 6px 16px;
-    border-radius: 99px;
-    font-size: 11px;
-    letter-spacing: 2px;
-    font-weight: 700;
-    text-transform: uppercase;
-  }
-  .badge-hot { background: rgba(255,45,120,0.15); border: 1px solid var(--hot); color: var(--hot); }
-  .badge-purp { background: rgba(176,95,255,0.15); border: 1px solid var(--purp); color: var(--purp); }
-  .badge-cyan { background: rgba(0,240,255,0.15); border: 1px solid var(--cyan); color: var(--cyan); }
+        .creator-badge a {
+            color: #ff8800;
+            text-decoration: none;
+            font-weight: 600;
+        }
 
-  .scroll-hint {
-    position: absolute;
-    bottom: 32px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--fade);
-    animation: bounce 2s infinite;
-  }
+        /* Layout */
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 24px 16px;
+            display: flex;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
 
-  /* Section */
-  section {
-    padding: 80px 20px;
-    max-width: 900px;
-    margin: 0 auto;
-  }
+        .main-content {
+            flex: 3;
+            min-width: 300px;
+        }
 
-  .section-label {
-    font-size: 10px;
-    letter-spacing: 5px;
-    color: var(--hot);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-  }
+        .sidebar {
+            flex: 1;
+            min-width: 250px;
+        }
 
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(36px, 8vw, 64px);
-    letter-spacing: 3px;
-    line-height: 1;
-    margin-bottom: 48px;
-  }
+        /* GitHub-style tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--github-border);
+            margin-bottom: 20px;
+        }
 
-  /* Clone block */
-  .clone-block {
-    background: var(--card);
-    border: 1px solid rgba(255,45,120,0.2);
-    border-radius: 16px;
-    overflow: hidden;
-    margin-bottom: 20px;
-    transition: border-color 0.3s;
-  }
-  .clone-block:hover { border-color: var(--hot); }
+        .tab {
+            padding: 8px 16px;
+            font-size: 14px;
+            color: #8b949e;
+            border-bottom: 2px solid transparent;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
 
-  .clone-header {
-    padding: 14px 20px;
-    background: rgba(255,45,120,0.08);
-    border-bottom: 1px solid rgba(255,45,120,0.15);
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--hot);
-    text-transform: uppercase;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
+        .tab.active {
+            color: #f0f6fc;
+            border-bottom: 2px solid var(--soundcloud-orange);
+            font-weight: 500;
+        }
 
-  .clone-code {
-    padding: 20px;
-    font-family: 'Space Mono', monospace;
-    font-size: 13px;
-    color: var(--cyan);
-    word-break: break-all;
-    line-height: 1.6;
-  }
+        /* File Explorer Mock */
+        .file-box {
+            border: 1px solid var(--github-border);
+            border-radius: 6px;
+            background: #0d1117;
+            margin-bottom: 24px;
+        }
 
-  .copy-btn {
-    background: var(--hot);
-    color: white;
-    border: none;
-    padding: 8px 18px;
-    border-radius: 8px;
-    font-family: 'Space Mono', monospace;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-transform: uppercase;
-  }
-  .copy-btn:hover { background: var(--pink); transform: scale(1.05); }
-  .copy-btn.copied { background: #00c853; }
+        .file-header {
+            padding: 10px 16px;
+            background: #161b22;
+            border-bottom: 1px solid var(--github-border);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
 
-  /* Feature grid */
-  .feat-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-    gap: 16px;
-  }
+        .file-row {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--github-border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
 
-  .feat-card {
-    background: var(--card);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 16px;
-    padding: 24px;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-  .feat-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    opacity: 0;
-    transition: opacity 0.3s;
-  }
-  .feat-card:hover { border-color: var(--purp); transform: translateY(-4px); }
-  .feat-card:hover::before { opacity: 1; }
+        .file-row:last-child {
+            border-bottom: none;
+        }
 
-  .feat-letter {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 48px;
-    line-height: 1;
-    margin-bottom: 12px;
-  }
-  .feat-letter.a { color: var(--hot); }
-  .feat-letter.b { color: var(--pink); }
-  .feat-letter.c { color: var(--purp); }
-  .feat-letter.d { color: var(--cyan); }
-  .feat-letter.e { color: var(--elec); }
-  .feat-letter.f { color: var(--fade); }
-  .feat-letter.g { color: #00c853; }
-  .feat-letter.h { color: var(--lime); }
-  .feat-letter.i { color: var(--elec); }
+        .file-icon {
+            width: 20px;
+            color: #8b949e;
+        }
 
-  .feat-name {
-    font-family: 'Syne', sans-serif;
-    font-size: 15px;
-    font-weight: 800;
-    margin-bottom: 8px;
-    color: var(--white);
-  }
+        .file-name {
+            color: #e6edf3;
+        }
 
-  .feat-desc {
-    font-size: 11px;
-    line-height: 1.7;
-    color: rgba(240,240,255,0.5);
-  }
+        .file-name i {
+            margin-right: 8px;
+            color: #ff8800;
+        }
 
-  /* Profile / About */
-  .profile-card {
-    background: var(--card);
-    border: 1px solid rgba(176,95,255,0.2);
-    border-radius: 24px;
-    padding: 40px;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-    position: relative;
-    overflow: hidden;
-  }
+        /* README Preview Card */
+        .readme-card {
+            border: 1px solid var(--github-border);
+            border-radius: 6px;
+            background: #0d1117;
+            padding: 24px;
+            margin-top: 20px;
+        }
 
-  .profile-card::after {
-    content: '999';
-    position: absolute;
-    bottom: -20px;
-    right: 20px;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 140px;
-    color: rgba(176,95,255,0.04);
-    pointer-events: none;
-    line-height: 1;
-  }
+        .readme-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            border-bottom: 1px solid var(--github-border);
+            padding-bottom: 12px;
+        }
 
-  .profile-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 48px;
-    letter-spacing: 3px;
-    background: linear-gradient(90deg, var(--purp), var(--cyan));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
+        .code-block {
+            background: #161b22;
+            padding: 16px;
+            border-radius: 6px;
+            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Fira Mono', monospace;
+            font-size: 13px;
+            margin: 16px 0;
+            position: relative;
+            border: 1px solid #30363d;
+            overflow-x: auto;
+        }
 
-  .profile-role {
-    font-size: 12px;
-    letter-spacing: 3px;
-    color: var(--hot);
-    text-transform: uppercase;
-    margin-top: -12px;
-  }
+        .copy-btn {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
 
-  .profile-bio {
-    font-size: 13px;
-    line-height: 1.8;
-    color: rgba(240,240,255,0.65);
-    max-width: 500px;
-  }
+        .copy-btn:hover {
+            background: #30363d;
+            color: white;
+            border-color: #ff5500;
+        }
 
-  .profile-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
+        .clone-bar {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 6px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
 
-  .profile-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 20px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: none;
-    letter-spacing: 1px;
-    transition: all 0.2s;
-  }
-  .link-sc { background: rgba(255,85,0,0.15); border: 1px solid rgba(255,85,0,0.4); color: #ff5500; }
-  .link-sc:hover { background: rgba(255,85,0,0.25); transform: scale(1.04); }
-  .link-rn { background: rgba(0,240,255,0.1); border: 1px solid rgba(0,240,255,0.3); color: var(--cyan); }
-  .link-rn:hover { background: rgba(0,240,255,0.2); transform: scale(1.04); }
-  .link-fb { background: rgba(24,119,242,0.15); border: 1px solid rgba(24,119,242,0.4); color: #4a9eff; }
-  .link-fb:hover { background: rgba(24,119,242,0.25); transform: scale(1.04); }
-  .link-gh { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: var(--white); }
-  .link-gh:hover { background: rgba(255,255,255,0.12); transform: scale(1.04); }
+        .clone-input {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            color: #e6edf3;
+            padding: 8px 12px;
+            border-radius: 6px;
+            flex: 1;
+            font-family: monospace;
+            font-size: 14px;
+        }
 
-  /* Music strip */
-  .music-strip {
-    background: linear-gradient(135deg, rgba(255,45,120,0.08), rgba(176,95,255,0.08));
-    border: 1px solid rgba(255,45,120,0.15);
-    border-radius: 16px;
-    padding: 28px;
-    text-align: center;
-  }
+        .btn {
+            background: #21262d;
+            border: 1px solid #30363d;
+            color: #c9d1d9;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
 
-  .music-label {
-    font-size: 10px;
-    letter-spacing: 5px;
-    color: var(--hot);
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
+        .btn-primary {
+            background: var(--soundcloud-orange);
+            border-color: #ff7700;
+            color: white;
+        }
 
-  .music-name {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 36px;
-    letter-spacing: 4px;
-    background: linear-gradient(90deg, var(--hot), var(--purp));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 20px;
-  }
+        .btn-primary:hover {
+            background: #ff6a00;
+        }
 
-  .music-links {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: center;
-  }
+        .btn:hover {
+            background: #30363d;
+            color: white;
+        }
 
-  .music-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 24px;
-    border-radius: 99px;
-    font-size: 12px;
-    font-weight: 700;
-    text-decoration: none;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    transition: all 0.25s;
-  }
-  .music-link-sc { background: #ff5500; color: white; }
-  .music-link-sc:hover { background: #ff7733; transform: scale(1.06); box-shadow: 0 0 20px rgba(255,85,0,0.4); }
-  .music-link-rn { background: linear-gradient(135deg, var(--hot), var(--purp)); color: white; }
-  .music-link-rn:hover { transform: scale(1.06); box-shadow: 0 0 20px rgba(176,95,255,0.4); }
+        .warning-box {
+            background: #ff550010;
+            border-left: 4px solid #ff5500;
+            padding: 16px;
+            margin: 20px 0;
+            border-radius: 0 6px 6px 0;
+        }
 
-  /* Steps */
-  .steps {
-    counter-reset: step;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-  }
+        .contact-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
 
-  .step {
-    display: flex;
-    gap: 20px;
-    align-items: flex-start;
-    padding: 20px;
-    background: var(--card);
-    border-radius: 16px;
-    border: 1px solid rgba(255,255,255,0.05);
-  }
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #161b22;
+            padding: 10px 14px;
+            border-radius: 30px;
+            border: 1px solid #30363d;
+        }
 
-  .step-num {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 40px;
-    line-height: 1;
-    color: var(--hot);
-    min-width: 40px;
-  }
+        .footer {
+            text-align: center;
+            padding: 30px;
+            color: #8b949e;
+            border-top: 1px solid var(--github-border);
+            margin-top: 40px;
+        }
 
-  .step-content h4 {
-    font-family: 'Syne', sans-serif;
-    font-size: 14px;
-    font-weight: 800;
-    margin-bottom: 6px;
-    color: var(--white);
-  }
+        .glow {
+            color: #ff8800;
+            text-shadow: 0 0 5px #ff5500;
+        }
 
-  .step-content p {
-    font-size: 12px;
-    color: rgba(240,240,255,0.5);
-    line-height: 1.6;
-    margin-bottom: 10px;
-  }
+        a {
+            color: #ff8800;
+            text-decoration: none;
+        }
 
-  /* Divider */
-  .divider {
-    height: 1px;
-    background: linear-gradient(90deg, transparent, var(--fade), transparent);
-    margin: 0 20px;
-  }
-
-  /* Footer */
-  footer {
-    text-align: center;
-    padding: 60px 20px;
-    border-top: 1px solid rgba(255,255,255,0.05);
-  }
-
-  .footer-brand {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 5px;
-    background: linear-gradient(90deg, var(--hot), var(--purp), var(--cyan));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 8px;
-  }
-
-  .footer-sub {
-    font-size: 11px;
-    letter-spacing: 3px;
-    color: var(--fade);
-    text-transform: uppercase;
-  }
-
-  /* Animations */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(24px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes bounce {
-    0%, 100% { transform: translateX(-50%) translateY(0); }
-    50% { transform: translateX(-50%) translateY(8px); }
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.4; }
-  }
-
-  .live-dot {
-    display: inline-block;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #00c853;
-    margin-right: 8px;
-    animation: pulse 1.5s infinite;
-  }
-
-  /* Responsive */
-  @media (max-width: 600px) {
-    .profile-card { padding: 24px; }
-    section { padding: 60px 16px; }
-  }
-</style>
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
 
-<!-- HERO -->
-<div class="hero">
-  <div class="hero-bg"></div>
-  <div class="scan-lines"></div>
-  <div style="position:relative;z-index:1;">
-    <p class="tag">🔧 Strategy Over Impulse · Ravensmead, Cape Town · 999</p>
-    <h1 class="hero-title">ARSENAL</h1>
-    <p class="hero-sub">Rebuild V2 · Unified Termux Command Hub</p>
-    <p class="hero-desc">
-      The most complete Termux maintenance and security toolkit built from a single Android phone.
-      No laptop. No team. Pure strategy.
-    </p>
-    <div class="hero-badges">
-      <span class="badge badge-hot">✅ Stable</span>
-      <span class="badge badge-purp">🐕 Bojack Daemon</span>
-      <span class="badge badge-cyan">🔒 Permission-Gated</span>
-      <span class="badge badge-hot">🛡️ Nothing runs without you</span>
+<!-- Wave Header -->
+<div class="wave-header">
+    <div class="logo-area">
+        <i class="fab fa-github github-icon"></i>
+        <div>
+            <div class="repo-title"><i class="fas fa-headphones-alt" style="color: #ff5500; margin-right: 8px;"></i> philfesters / <span>pleasepush</span></div>
+            <div class="tagline">🎤 From Rap to Repo · Link Termux to GitHub without password pain</div>
+        </div>
     </div>
-  </div>
-  <div class="scroll-hint">↓ &nbsp; SCROLL &nbsp; ↓</div>
+    <div class="creator-badge">
+        <i class="fas fa-user-astronaut"></i> Grant Phil Festers · 
+        <a href="#"><i class="fab fa-whatsapp"></i> +27 73 930 1858</a>
+    </div>
 </div>
 
-<div class="divider"></div>
+<div class="container">
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active"><i class="fas fa-code"></i> Code</div>
+            <div class="tab"><i class="fas fa-exclamation-circle"></i> Issues</div>
+            <div class="tab"><i class="fas fa-code-branch"></i> Pull requests</div>
+            <div class="tab"><i class="fas fa-play"></i> Actions</div>
+        </div>
 
-<!-- CLONE / INSTALL -->
-<section>
-  <p class="section-label">📦 Get it</p>
-  <h2 class="section-title" style="background:linear-gradient(90deg,var(--hot),var(--purp));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Clone &amp; Run</h2>
+        <!-- Clone Bar with Copy -->
+        <div class="clone-bar">
+            <i class="fas fa-link" style="color: #8b949e;"></i>
+            <input type="text" class="clone-input" value="git clone git@github.com:philfesters/pleasepush.git" id="cloneUrl" readonly>
+            <button class="btn" id="copyCloneBtn"><i class="far fa-copy"></i> Copy</button>
+            <button class="btn btn-primary" id="downloadPdfBtn"><i class="fas fa-file-pdf"></i> Download PDF Guide</button>
+            <span style="margin-left: auto; font-size: 13px; color: #ff8800;"><i class="fas fa-music"></i> no password · SSH only</span>
+        </div>
 
-  <div class="clone-block">
-    <div class="clone-header">
-      <span>🔗 Clone via SSH</span>
-      <button class="copy-btn" onclick="copyText(this,'git clone git@github.com:philfesters/rebuild.git')">Copy</button>
-    </div>
-    <div class="clone-code">git clone git@github.com:philfesters/rebuild.git</div>
-  </div>
+        <!-- File Explorer Mock (like GitHub) -->
+        <div class="file-box">
+            <div class="file-header">
+                <span><i class="fas fa-headphones" style="color: #ff5500;"></i> Grant Phil Festers · pleasepush</span>
+                <span style="color: #8b949e;">main branch</span>
+            </div>
+            <div class="file-row">
+                <div class="file-icon"><i class="far fa-file-alt"></i></div>
+                <div class="file-name"><i class="fab fa-readme"></i> README.md</div>
+                <span style="margin-left: auto; color: #8b949e;">Termux to GitHub bible</span>
+            </div>
+            <div class="file-row">
+                <div class="file-icon"><i class="far fa-file-pdf"></i></div>
+                <div class="file-name"><i class="fas fa-download"></i> Termux_to_GitHub_Guide.pdf</div>
+                <span style="margin-left: auto; color: #8b949e;">(Downloadable)</span>
+            </div>
+            <div class="file-row">
+                <div class="file-icon"><i class="far fa-file-code"></i></div>
+                <div class="file-name"><i class="fab fa-html5"></i> index.html</div>
+                <span style="margin-left: auto; color: #8b949e;">This page</span>
+            </div>
+            <div class="file-row">
+                <div class="file-icon"><i class="far fa-file"></i></div>
+                <div class="file-name"><i class="fas fa-balance-scale"></i> LICENSE</div>
+            </div>
+        </div>
 
-  <div class="clone-block">
-    <div class="clone-header">
-      <span>🌐 Clone via HTTPS</span>
-      <button class="copy-btn" onclick="copyText(this,'git clone https://github.com/philfesters/rebuild.git')">Copy</button>
-    </div>
-    <div class="clone-code">git clone https://github.com/philfesters/rebuild.git</div>
-  </div>
+        <!-- README Preview Section (the core content) -->
+        <div class="readme-card">
+            <div class="readme-header">
+                <i class="fab fa-readme" style="margin-right: 8px; color: #ff5500;"></i> README.md · Grant Phil Festers · BoJack & Termux
+            </div>
 
-  <div class="clone-block">
-    <div class="clone-header">
-      <span>⚡ Optional · Set as alias (add to ~/.bashrc)</span>
-      <button class="copy-btn" onclick="copyText(this,`alias rebuild=\'bash ~/rebuild/rebuild.sh\'`)">Copy</button>
-    </div>
-    <div class="clone-code">alias rebuild='bash ~/rebuild/rebuild.sh'</div>
-  </div>
+            <h1 style="display: flex; align-items: center; gap: 12px;">
+                🎧 pleasepush 
+                <span style="font-size: 16px; background: #21262d; padding: 4px 12px; border-radius: 20px;">🎤 Ex-Rapper / Self‑taught dev</span>
+            </h1>
+            <p style="font-size: 18px; margin: 12px 0; color: #c9d1d9;">
+                <i class="fas fa-skull" style="color: #ff5500;"></i> "You turn yourself around. That's what it's all about." — BoJack. <br>
+                I used to spit bars, now I push repos. No password. No excuses.
+            </p>
+            
+            <!-- Introduction with dark humor -->
+            <div style="background: #0d1117; padding: 16px; border-radius: 8px; border: 1px solid #ff550040;">
+                <p>👤 <strong>Grant Phil Festers</strong> · philfesters@gmail.com</p>
+                <p>🎬 Content creator with a BoJack-level self-awareness. I learned this stuff the hard way so you don't have to stare at <code>Permission denied (publickey)</code> like it's a Todd scheme.</p>
+                <p>📱 WhatsApp (repos ideas only): <strong>+27 73 930 1858</strong> · Facebook: <strong>Grant Fezzy Festers</strong></p>
+            </div>
 
-  <div class="clone-block">
-    <div class="clone-header">
-      <span>🚀 Launch directly</span>
-      <button class="copy-btn" onclick="copyText(this,'bash ~/rebuild/rebuild.sh')">Copy</button>
-    </div>
-    <div class="clone-code">bash ~/rebuild/rebuild.sh</div>
-  </div>
-</section>
+            <h2 style="margin-top: 32px;">🔥 Why this repo? <span style="font-size: 14px; font-weight: normal;">(the selling line)</span></h2>
+            <div class="warning-box">
+                <i class="fas fa-key"></i> <strong>Link Termux to GitHub and push/clone tools with NO PASSWORD.</strong> SSH keys are your backstage pass. No more typing credentials on a tiny screen. Copy, paste, push. Like a producer hitting the drop.
+            </div>
 
-<div class="divider"></div>
+            <!-- STEP-BY-STEP SSH / TERMUX -->
+            <h3><i class="fas fa-terminal" style="color: #ff8800;"></i> 🚀 Termux to GitHub: The Phil Festers Way</h3>
+            
+            <h4>1️⃣ Generate SSH Key (in Termux)</h4>
+            <div class="code-block">
+                ssh-keygen -t ed25519 -C "your-email@example.com"
+                <button class="copy-btn" data-code="ssh-keygen -t ed25519 -C "your-email@example.com""><i class="far fa-copy"></i> Copy</button>
+            </div>
+            <p>Press Enter for default location. <strong>Don't set a passphrase</strong> if you want pure passwordless flow (but read rules below).</p>
 
-<!-- FEATURES -->
-<section>
-  <p class="section-label">🗂️ What's inside</p>
-  <h2 class="section-title" style="color:var(--white);">9 Module<br/>Categories</h2>
+            <h4>2️⃣ Copy the PUBLIC key (rules to avoid decline)</h4>
+            <div class="code-block">
+                cat ~/.ssh/id_ed25519.pub
+                <button class="copy-btn" data-code="cat ~/.ssh/id_ed25519.pub"><i class="far fa-copy"></i> Copy</button>
+            </div>
+            <p><i class="fas fa-exclamation-triangle" style="color: #ff5500;"></i> <strong>PASTING RULES:</strong> Copy the ENTIRE line starting with <code>ssh-ed25519</code> and ending with your email. No extra spaces, no newlines. If you miss a character, GitHub declines it like a bad audition.</p>
 
-  <div class="feat-grid">
-    <div class="feat-card">
-      <div class="feat-letter a">A</div>
-      <div class="feat-name">Diagnostics &amp; Audit</div>
-      <div class="feat-desc">Environment scan, command availability checker, system info report, Python environment audit. Know exactly what's installed — and what's broken.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter b">B</div>
-      <div class="feat-name">Repair &amp; Fix</div>
-      <div class="feat-desc">Package manager rescue, mirror reset, .bashrc validator, alias repair, storage recovery. Everything that breaks gets fixed — with your permission.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter c">C</div>
-      <div class="feat-name">Performance &amp; Clean</div>
-      <div class="feat-desc">Freeze fixer, process manager, and DETOX — a 9-module full clean covering cache, deps, history, and junk. Your Termux runs lean.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter d">D</div>
-      <div class="feat-name">Install &amp; Rebuild</div>
-      <div class="feat-desc">Core env setup, Security Hub (nuclei, nikto, lynis, gobuster), Media tools (yt-dlp, ffmpeg, spotdl), OSINT tools (sherlock, theHarvester, maigret), full rebuild.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter e">E</div>
-      <div class="feat-name">Connectivity &amp; GitHub</div>
-      <div class="feat-desc">SSH and GitHub key setup, network diagnostics, Tor and Proxychains status. Stay connected, stay anonymous.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter f">F</div>
-      <div class="feat-name">Encyclopedia</div>
-      <div class="feat-desc">Reference only — nothing is modified. Alias guide, error code library, common issues matrix, SOI knowledge base. Read, learn, apply.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter g">G</div>
-      <div class="feat-name">Auto-Repair</div>
-      <div class="feat-desc">Full auto-repair runs all fix modules sequentially. One-Shot Fresh Install restores your complete Termux environment from scratch in 7 modules.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter h">H</div>
-      <div class="feat-name">Extras</div>
-      <div class="feat-desc">Backup and restore your configs to /sdcard, dev environment setup (vim, tmux, gum, Go), Android Bridge check for sensors and notifications.</div>
-    </div>
-    <div class="feat-card">
-      <div class="feat-letter i">I</div>
-      <div class="feat-name">Housekeeping &amp; Health</div>
-      <div class="feat-desc">Orphan file hunter, duplicate file scanner, empty folder sweep, dead dep cleaner, and a 10-point health audit with Bojack's verdict at the end.</div>
-    </div>
-  </div>
-</section>
+            <h4>3️⃣ Add key to GitHub</h4>
+            <p>Go to <a href="https://github.com/settings/keys" target="_blank">GitHub SSH Keys</a> → "New SSH Key". Paste it. Title: "Termux Beast".</p>
 
-<div class="divider"></div>
+            <h4>4️⃣ Clone this repo (or any) password-free</h4>
+            <div class="code-block">
+                git clone git@github.com:philfesters/pleasepush.git
+                <button class="copy-btn" data-code="git clone git@github.com:philfesters/pleasepush.git"><i class="far fa-copy"></i> Copy</button>
+            </div>
 
-<!-- QUICK START STEPS -->
-<section>
-  <p class="section-label">📋 Quick start</p>
-  <h2 class="section-title" style="color:var(--white);">Up in<br/>4 Steps</h2>
+            <h4>5️⃣ Push from Termux like a boss</h4>
+            <div class="code-block">
+                git add .<br>
+                git commit -m "🎤 dropped some code"<br>
+                git push origin main
+                <button class="copy-btn" data-code="git add .\ngit commit -m \"🎤 dropped some code\"\ngit push origin main"><i class="far fa-copy"></i> Copy</button>
+            </div>
 
-  <div class="steps">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-content">
-        <h4>Clone the repo</h4>
-        <p>Open Termux and clone using SSH or HTTPS above.</p>
-      </div>
+            <!-- TROUBLESHOOTING -->
+            <h3 style="margin-top: 32px;">🛠️ Troubleshooting · Common Errors</h3>
+            <div style="display: grid; gap: 12px;">
+                <div style="background: #161b22; padding: 12px; border-radius: 8px;">
+                    <code style="color: #ff7b72;">Permission denied (publickey).</code><br>
+                    ➜ SSH key not added or agent not running. Run <code>eval "$(ssh-agent -s)"</code> then <code>ssh-add ~/.ssh/id_ed25519</code>.
+                </div>
+                <div style="background: #161b22; padding: 12px; border-radius: 8px;">
+                    <code style="color: #ff7b72;">Could not resolve hostname</code><br>
+                    ➜ Termux network issue. Try <code>ping github.com</code>. If no response, check data/WiFi.
+                </div>
+                <div style="background: #161b22; padding: 12px; border-radius: 8px;">
+                    <code style="color: #ff7b72;">fatal: not a git repository</code><br>
+                    ➜ You forgot to <code>git init</code> or you're in wrong folder.
+                </div>
+            </div>
+
+            <h3 style="margin-top: 24px;">🚫 Rules: What NOT to do with your SSH key</h3>
+            <ul style="margin-left: 20px; color: #c9d1d9;">
+                <li>❌ NEVER share your private key (<code>id_ed25519</code> without .pub). That's like giving out your master password.</li>
+                <li>❌ Do not add passphrase if you want true passwordless Termux flow (but understand the risk).</li>
+                <li>❌ Don't paste the key with line breaks — GitHub will reject.</li>
+                <li>❌ Never commit your private key to a repo. Use <code>.gitignore</code>.</li>
+            </ul>
+
+            <div style="margin-top: 28px; background: #ff550010; padding: 20px; border-radius: 12px;">
+                <p style="font-size: 20px;">🎧 <strong>Clone this repo now</strong> · copy the SSH link above and run in Termux.</p>
+                <p>I used to rap about life, now I develop repos. Hit me up on WhatsApp for more ideas: <strong>+27 73 930 1858</strong> (WhatsApp only). Facebook: Grant Fezzy Festers.</p>
+                <p><i class="fas fa-heart" style="color: #ff5500;"></i> Grant Phil Festers · <em>"Back in the 90s I was in a very famous TV show..."</em> wait wrong horse.</p>
+            </div>
+        </div>
     </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-content">
-        <h4>Launch it</h4>
-        <p>Run <code style="color:var(--cyan);font-size:12px;">bash ~/rebuild/rebuild.sh</code> — the boot sequence runs and Bojack greets you.</p>
-      </div>
+
+    <!-- SIDEBAR (About section) -->
+    <div class="sidebar">
+        <div style="border: 1px solid var(--github-border); border-radius: 6px; padding: 16px; background: #0d1117;">
+            <h3 style="margin-bottom: 16px;"><i class="fas fa-info-circle"></i> About</h3>
+            <p style="margin-bottom: 16px;">🎵 SoundCloud-style repo. Turn Termux into a GitHub remote without passwords. SSH only.</p>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px;">
+                <span style="background: #21262d; padding: 4px 10px; border-radius: 20px;">🔑 ssh</span>
+                <span style="background: #21262d; padding: 4px 10px; border-radius: 20px;">📱 termux</span>
+                <span style="background: #21262d; padding: 4px 10px; border-radius: 20px;">🎸 self-taught</span>
+            </div>
+            <p><i class="fas fa-link"></i> <a href="#">https://github.com/philfesters/pleasepush</a></p>
+            <hr style="border-color: #30363d; margin: 16px 0;">
+            <h4><i class="fas fa-address-card"></i> Creator</h4>
+            <p><strong>Grant Phil Festers</strong><br>philfesters@gmail.com</p>
+            <div class="contact-grid">
+                <div class="contact-item">
+                    <i class="fab fa-whatsapp" style="color: #25D366; font-size: 20px;"></i>
+                    <span>+27 73 930 1858 (WhatsApp only)</span>
+                </div>
+                <div class="contact-item">
+                    <i class="fab fa-facebook" style="color: #1877F2;"></i>
+                    <span>Grant Fezzy Festers</span>
+                </div>
+            </div>
+            <p style="margin-top: 16px; font-style: italic;">"I was a rapper, now I push commits."</p>
+        </div>
     </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-content">
-        <h4>Optional — set alias</h4>
-        <p>Add <code style="color:var(--cyan);font-size:12px;">alias rebuild='bash ~/rebuild/rebuild.sh'</code> to your ~/.bashrc then <code style="color:var(--cyan);font-size:12px;">source ~/.bashrc</code>. Now just type <code style="color:var(--hot);font-size:12px;">rebuild</code>.</p>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-content">
-        <h4>Nothing runs without you</h4>
-        <p>Every module asks before it acts. You approve every change. Strategy Over Impulse — always.</p>
-      </div>
-    </div>
-  </div>
-</section>
+</div>
 
-<div class="divider"></div>
-
-<!-- BOJACK DAEMON -->
-<section>
-  <p class="section-label">🐕 The mascot</p>
-  <h2 class="section-title" style="background:linear-gradient(90deg,var(--purp),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Bojack<br/>Daemon</h2>
-
-  <div style="background:var(--card);border:1px solid rgba(176,95,255,0.2);border-radius:20px;padding:32px;">
-    <p style="font-size:14px;line-height:1.9;color:rgba(240,240,255,0.7);margin-bottom:20px;">
-      🐾 <strong style="color:var(--purp);">Bojack</strong> is the Lab/Husky daemon that watches over your Termux environment. 
-      His health audit at the end of every diagnostic scan tells you the truth — no sugar-coating.<br/><br/>
-      Score above 80%? <em style="color:#00c853;">"Wire is clean. 999. [K9]"</em><br/>
-      Above 50%? <em style="color:var(--lime);">"Few loose wires. Handle it."</em><br/>
-      Below 50%? <em style="color:var(--hot);">"This terminal has seen better days."</em>
-    </p>
-    <p style="font-size:11px;letter-spacing:2px;color:var(--purp);text-transform:uppercase;">
-      🔍 Bojack routes your problems · Never modifies without permission · Always tells you what to fix
-    </p>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- MUSIC -->
-<section>
-  <p class="section-label">🎵 The artist</p>
-  <div class="music-strip">
-    <p class="music-label">🎤 Listen to Fezzy CPT</p>
-    <p class="music-name">Fezzy CPT</p>
-    <p style="font-size:12px;color:rgba(240,240,255,0.5);margin-bottom:20px;line-height:1.7;">
-      Ravensmead, Cape Town · Hip-Hop · Street Bars · Real Life<br/>
-      The same mind building ARSENAL is spitting on these tracks. 999.
-    </p>
-    <div class="music-links">
-      <a href="https://m.soundcloud.com/hiphopfezzy" target="_blank" class="music-link music-link-sc">
-        ☁️ SoundCloud
-      </a>
-      <a href="https://www.reverbnation.com/FezzyFesters/songs" target="_blank" class="music-link music-link-rn">
-        🎵 ReverbNation
-      </a>
-    </div>
-  </div>
-</section>
-
-<div class="divider"></div>
-
-<!-- ABOUT -->
-<section>
-  <p class="section-label">👤 The builder</p>
-  <h2 class="section-title" style="color:var(--white);">Grant Fezzy<br/>Festers</h2>
-
-  <div class="profile-card">
-    <div>
-      <p class="profile-name">Grant Fezzy Festers</p>
-      <p class="profile-role">Self-taught developer · Ravensmead, Cape Town, ZA</p>
-    </div>
-    <p class="profile-bio">
-      🏠 Built entirely from an Android phone using Termux. No laptop. No team. Just an Honor X5b, 
-      a Lab/Husky named Bojack, and a personal philosophy called <strong style="color:var(--hot);">Strategy Over Impulse</strong>.<br/><br/>
-      💡 ARSENAL started as a collection of repair scripts and grew into a full Termux command hub 
-      covering security tools, OSINT, media, environment repair, and system health. Every line written 
-      on a phone screen. Every module tested on real hardware.<br/><br/>
-      <span style="color:var(--purp);">999 · Turn struggle into something positive.</span>
-    </p>
-    <div class="profile-links">
-      <a href="https://github.com/philfesters" target="_blank" class="profile-link link-gh">
-        💻 GitHub
-      </a>
-      <a href="https://m.soundcloud.com/hiphopfezzy" target="_blank" class="profile-link link-sc">
-        ☁️ SoundCloud
-      </a>
-      <a href="https://www.reverbnation.com/FezzyFesters/songs" target="_blank" class="profile-link link-rn">
-        🎵 ReverbNation
-      </a>
-      <a href="https://www.facebook.com/search/top?q=Fezzy%20CPT" target="_blank" class="profile-link link-fb">
-        📘 Facebook
-      </a>
-    </div>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer>
-  <div class="footer-brand">Strategy Over Impulse</div>
-  <p class="footer-sub">
-    <span class="live-dot"></span>
-    Arsenal · Rebuild V2 · Grant Fezzy Festers · Ravensmead · 999
-  </p>
-  <p style="margin-top:16px;font-size:11px;color:rgba(255,255,255,0.15);">
-    Built on an Android phone. One Termux session at a time.
-  </p>
-</footer>
+<div class="footer">
+    🎤 pleasepush · Grant Phil Festers · "You are Secretariat." · No passwords, only SSH vibes.
+</div>
 
 <script>
-  function copyText(btn, text) {
-    navigator.clipboard.writeText(text).then(() => {
-      const orig = btn.textContent;
-      btn.textContent = '✓ Copied!';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = orig;
-        btn.classList.remove('copied');
-      }, 2000);
-    }).catch(() => {
-      // fallback
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      document.body.appendChild(ta);
-      ta.select();
-      document.execCommand('copy');
-      document.body.removeChild(ta);
-      btn.textContent = '✓ Done!';
-      btn.classList.add('copied');
-      setTimeout(() => {
-        btn.textContent = 'Copy';
-        btn.classList.remove('copied');
-      }, 2000);
-    });
-  }
+    (function() {
+        // Copy functionality
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                let code = this.getAttribute('data-code') || '';
+                // For the clone input, we use separate logic
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                    setTimeout(() => { this.innerHTML = originalText; }, 1500);
+                }).catch(err => {
+                    alert('Failed to copy: ' + err);
+                });
+            });
+        });
+
+        // Clone input copy
+        document.getElementById('copyCloneBtn').addEventListener('click', function() {
+            const input = document.getElementById('cloneUrl');
+            input.select();
+            navigator.clipboard.writeText(input.value).then(() => {
+                const btn = document.getElementById('copyCloneBtn');
+                btn.innerHTML = '<i class="fas fa-check"></i> Copied!';
+                setTimeout(() => { btn.innerHTML = '<i class="far fa-copy"></i> Copy'; }, 1500);
+            });
+        });
+
+        // PDF Generation (downloadable guide)
+        document.getElementById('downloadPdfBtn').addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Content from the page
+            const title = "pleasepush · Grant Phil Festers · Termux to GitHub Guide";
+            const content = `
+            Grant Phil Festers - philfesters@gmail.com
+            Ex-rapper, self-taught dev. BoJack humor included.
+            
+            === LINK TERMUX TO GITHUB (NO PASSWORD) ===
+            
+            1. Generate SSH key:
+               ssh-keygen -t ed25519 -C "your-email@example.com"
+            
+            2. Copy public key:
+               cat ~/.ssh/id_ed25519.pub
+            
+               PASTE RULES: Copy the whole line from "ssh-ed25519" to email.
+               No extra spaces, no line breaks.
+            
+            3. Add to GitHub: Settings > SSH Keys > New SSH Key.
+            
+            4. Clone repo:
+               git clone git@github.com:philfesters/pleasepush.git
+            
+            5. Push from Termux:
+               git add .
+               git commit -m "message"
+               git push origin main
+            
+            === TROUBLESHOOTING ===
+            - Permission denied (publickey): run ssh-add.
+            - Could not resolve host: check internet.
+            - Not a git repo: cd into correct folder.
+            
+            === RULES: NEVER share private key. No line breaks in key.
+            
+            Contact WhatsApp: +27 73 930 1858 (repos ideas)
+            Facebook: Grant Fezzy Festers
+            
+            I used to be a rapper, now I develop repos.
+            "You turn yourself around. That's what it's all about."
+            `;
+            
+            doc.setFontSize(16);
+            doc.text(title, 10, 20);
+            doc.setFontSize(10);
+            doc.text(content, 10, 30, { maxWidth: 180 });
+            
+            doc.save('Termux_to_GitHub_Guide_Grant_Festers.pdf');
+        });
+    })();
 </script>
 </body>
-</html>
+  </html>
